@@ -85,7 +85,7 @@
     var q = lv.check;
     var html = '<section class="check"><h2>概念確認</h2><p>' + esc(q.stem) + '</p><div class="opts">';
     q.options.forEach(function (t, i) {
-      html += '<button type="button" data-i="' + i + '">' + esc(t) + "</button>";
+      html += '<button type="button" data-i="' + i + '"><span class="opt-l">' + "ABCD".charAt(i) + "</span><span>" + esc(t) + "</span></button>";
     });
     html += '</div><p class="exp" hidden></p></section>';
     host.insertAdjacentHTML("beforeend", html);
@@ -134,8 +134,9 @@
     var body = panel.querySelector(".phase-body");
 
     if (p.type === "choose") {
+      body.classList.add("opts");
       body.innerHTML = p.options.map(function (t, i) {
-        return '<button type="button" data-i="' + i + '">' + esc(t) + "</button>";
+        return '<button type="button" data-i="' + i + '"><span class="opt-l">' + "ABCD".charAt(i) + "</span><span>" + esc(t) + "</span></button>";
       }).join("");
       body.addEventListener("click", function (e) {
         var btn = e.target.closest("button");
