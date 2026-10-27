@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>運算思維線上測驗</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700;900&display=swap">
+<link rel="stylesheet" href="../play/css/style.css">
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="hbar">
+      <a class="brand" href="../">運算思維<small>線上測驗 20 題</small></a>
+      <span class="spacer"></span>
+      <a href="../play/">關卡</a>
+    </div>
+  </div>
+</header>
+<main class="wrap">
+  <section class="hero">
+    <div class="eyebrow">送出後才看詳解</div>
+    <h1>線上測驗</h1>
+    <p class="hint">二十題四選一，涵蓋十二個概念。未送出前不顯示對錯。最高分只存在這台瀏覽器。</p>
+    <p id="best" class="hint"></p>
+    <p id="score" class="score" hidden></p>
+  </section>
+  <form id="exam"></form>
+</main>
+<script src="js/exam.js?v=2"></script>
+</body>
+</html>
