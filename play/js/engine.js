@@ -1,9 +1,16 @@
-/* 關卡地圖與四種互動：選擇、排順序、折紙迴圈、燈號。進度只存在這台瀏覽器。 */
+/* 關卡地圖與四種互動：選擇、排順序、折紙迴圈、燈號。
+   進度依 Google 帳號分開，並由 js/cloud-sync.js 寫入雲端。 */
 (function () {
   "use strict";
   var LEVELS = window.CT_LEVELS || [];
-  var KEY = "ct-solved-v1";
+  var SOLVED = "ct-solved-v1";
+  var EXAM = "ct-exam-best-v1";
   var app = document.getElementById("app");
+  function storageKey(base) {
+    return window.StudentAuth && window.StudentAuth.key ? window.StudentAuth.key(base) : base;
+  }
+  storageKey(SOLVED);
+  storageKey(EXAM);
 
   function esc(s) {
     return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
@@ -11,12 +18,13 @@
     });
   }
   function solvedSet() {
-    try { return new Set(JSON.parse(localStorage.getItem(KEY)) || []); }
+    try { return new Set(JSON.parse(localStorage.getItem(storageKey(SOLVED))) || []); }
     catch (e) { return new Set(); }
   }
   function save(set) {
-    localStorage.setItem(KEY, JSON.stringify(Array.from(set)));
+    localStorage.setItem(storageKey(SOLVED), JSON.stringify(Array.from(set)));
     paintProgress();
+    try { window.dispatchEvent(new Event("progress:saved")); } catch (e) {}
   }
   function indexOf(slug) {
     return LEVELS.findIndex(function (lv) { return lv.slug === slug; });
@@ -32,6 +40,9 @@
     if (a) a.textContent = String(n);
     if (b) b.textContent = String(LEVELS.length);
     if (f) f.style.width = (LEVELS.length ? (n / LEVELS.length) * 100 : 0) + "%";
+    if (window.StudentAuth && window.StudentAuth.setStatus) {
+      window.StudentAuth.setStatus("關卡 " + n + " / " + LEVELS.length + (n >= LEVELS.length ? " · 可以做線上測驗" : " · 完成後才開放線上測驗"));
+    }
   }
 
   function renderMap() {
@@ -51,16 +62,15 @@
     app.innerHTML =
       '<section class="hero"><div class="eyebrow">分解 · 規律 · 抽象 · 演算法</div>' +
       "<h1>運算思維互動關卡</h1>" +
-      "<p>十二個原創校園情境。每一關先動手，再看詳解，最後答一題概念確認。完成一關才解開下一關。</p>" +
-      '<div class="warn">這些題目參考封存課程的詳解寫法，<b>不是</b>國際運算思維挑戰賽的歷屆原題。作答只留在這台瀏覽器。</div></section>' +
-      '<div class="maphead"><h2>關卡</h2><button type="button" class="ghost" id="wipe">重設本機關卡進度</button></div>' +
+      "<p>十二個原創校園情境。每一關先動手，再看詳解，最後答一題概念確認。完成一關才解開下一關。十二關都完成後，才開放線上測驗。</p>" +
+      '<div class="warn">請先用 Google 登入。進度記在這個帳號，換一台電腦可以接續。題目是原創校園情境，不是國際運算思維挑戰賽的歷屆原題。</div></section>' +
+      '<div class="maphead"><h2>關卡</h2><button type="button" class="ghost" id="wipe">重置我的進度</button></div>' +
       '<div class="grid">' + cells + "</div>" +
-      (all ? '<aside class="final"><h2>十二關都完成了</h2><p><a href="../exam/">前往線上測驗（20 題）</a>。測驗不鎖關，也可以直接開考。</p></aside>' : "");
+      (all
+        ? '<aside class="final"><h2>十二關都完成了</h2><p><a href="../exam/">開始線上測驗（20 題）</a>。送出後才計分。</p></aside>'
+        : '<p class="hint">線上測驗還關著。目前 ' + set.size + " / " + LEVELS.length + " 關。</p>");
     document.getElementById("wipe").addEventListener("click", function () {
-      if (!confirm("清除這台瀏覽器上的關卡完成紀錄？")) return;
-      localStorage.removeItem(KEY);
-      renderMap();
-      paintProgress();
+      if (window.StudentAuth && window.StudentAuth.resetProgress) window.StudentAuth.resetProgress();
     });
     paintProgress();
   }
@@ -282,5 +292,9 @@
     else renderLevel(slug);
   }
   window.addEventListener("hashchange", route);
+  window.addEventListener("studentauth:change", function (ev) {
+    var r = ev.detail && ev.detail.reason;
+    if (r === "signin" || r === "switch" || r === "signout" || r === "reset" || r === "cloud") route();
+  });
   route();
 })();

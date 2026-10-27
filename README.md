@@ -22,4 +22,4 @@ python3 -m http.server 8765
 | `play/` | 12 關。完成一關才解開下一關 |
 | `exam/` | 20 題。送出後計分並顯示詳解 |
 
-進度與最高分存在這台瀏覽器的 localStorage，不上傳。
+用 Google 登入後，關卡完成名單與測驗最高分記在 Firestore `progress/{email}.ct`，換電腦可以接續。十二關都完成，線上測驗才開放。

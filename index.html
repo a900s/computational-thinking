@@ -12,21 +12,28 @@
 <div class="wrap">
   <p class="backhome">校園資訊課 · 原創練習</p>
   <h1>運算思維</h1>
-  <p class="hint">純前端。關卡先動手再看詳解；線上測驗 20 題送出後才計分。作答只存在這台瀏覽器，不上傳。</p>
+  <p class="hint">用 Google 登入後，關卡進度與測驗分數記在這個帳號。十二關都完成，才開放線上測驗。</p>
+  <div id="gsiArea" class="gsi"></div>
   <div class="hub">
     <a class="card" href="play/">
       <div class="eyebrow">INTERACTIVE</div>
       <h2>十二個互動關卡</h2>
-      <p>分解、找規律、抽象化、演算法、條件、迴圈、二進位、搜尋、路徑、排序、除錯、規則檢驗。</p>
+      <p>分解、找規律、抽象化、演算法、條件、迴圈、二進位、搜尋、路徑、排序、除錯、規則檢驗。完成一關才解開下一關。</p>
     </a>
-    <a class="card" href="exam/">
+    <a class="card" href="play/#/">
       <div class="eyebrow">EXAM</div>
       <h2>線上測驗 20 題</h2>
-      <p>四選一。送出後顯示分數與每一題的詳解，並保留這台瀏覽器的最高分。</p>
+      <p>十二關都完成後，關卡地圖最下方才出現測驗。送出後才計分。</p>
     </a>
   </div>
   <div class="warn">題目是依 114 學年封存課堂「運算思維」作業所附題庫的詳解寫法另寫的校園情境，不是競賽歷屆原題，也不能代替正式測驗。</div>
   <footer>文件供課堂使用。請勿把競賽題庫原文貼上公開頁面。</footer>
 </div>
+<script>window.REVIEW_DATA = { module: "ct", title: "運算思維" };</script>
+<script src="https://accounts.google.com/gsi/client" async></script>
+<script src="js/google-auth-config.js"></script>
+<script src="js/firebase-config.js"></script>
+<script src="js/student-auth.js"></script>
+<script src="js/cloud-sync.js"></script>
 </body>
 </html>

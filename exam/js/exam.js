@@ -1,7 +1,18 @@
-/* 線上測驗 20 題 — 原創。送出後才顯示分數與詳解，作答存在這台瀏覽器。 */
+/* 線上測驗 20 題。十二關都完成才開放。成績依 Google 帳號分開，並寫入雲端。 */
 (function () {
   "use strict";
+  var SOLVED = "ct-solved-v1";
   var KEY = "ct-exam-best-v1";
+  var NEED = 12;
+  function storageKey(base) {
+    return window.StudentAuth && window.StudentAuth.key ? window.StudentAuth.key(base) : base;
+  }
+  storageKey(SOLVED);
+  storageKey(KEY);
+  function solvedCount() {
+    try { return new Set(JSON.parse(localStorage.getItem(storageKey(SOLVED))) || []).size; }
+    catch (e) { return 0; }
+  }
   var ITEMS = [
     { topic: "分解", stem: "哪一種才是有用的分解？", options: ["把「辦班遊」拆成交通、餐飲、保險、集合，做完再合起來", "請一位同學獨自處理全部", "依同學的血型分組", "只決定集合地點，其他不做"], answer: 0, exp: "拆開的每一塊都能完成，合起來仍是辦班遊。一個人全部做完並沒有把問題變小；依血型分組和任務無關；只做集合地點則不完整。" },
     { topic: "找規律", stem: "數列 3、6、12、24，下一個是？", options: ["25", "48", "30", "36"], answer: 1, exp: "每一項都是前一項的 2 倍：24×2=48。25 只加 1，30 和 36 不是同一條規則。" },
@@ -31,26 +42,41 @@
     });
   }
   function best() {
-    var raw = localStorage.getItem(KEY);
+    var raw = localStorage.getItem(storageKey(KEY));
     if (raw == null || raw === "") return null;
     var n = Number(raw);
     return Number.isFinite(n) ? n : null;
   }
   function showBest() {
     var el = document.getElementById("best");
+    if (!el) return;
     var n = best();
-    el.textContent = n == null ? "這台瀏覽器還沒有成績" : "這台瀏覽器最高 " + n + " / " + ITEMS.length;
+    var who = window.StudentAuth && window.StudentAuth.getUser && window.StudentAuth.getUser();
+    var prefix = who ? who.email + " 的最高 " : "尚未登入，這台瀏覽器最高 ";
+    el.textContent = n == null ? (who ? who.email + " 還沒有測驗成績" : "登入後成績會記在 Google 帳號") : prefix + n + " / " + ITEMS.length;
   }
 
   var form = document.getElementById("exam");
-  form.innerHTML = ITEMS.map(function (q, i) {
+  var built = false;
+  function showLocked() {
+    built = false;
+    form.innerHTML = '<div class="warn">線上測驗要十二關都完成才開放。目前 ' + solvedCount() + " / " + NEED + ' 關。</div><p><a href="../play/">回關卡</a></p>';
+    var score = document.getElementById("score");
+    if (score) score.hidden = true;
+    showBest();
+  }
+  function buildForm() {
+    if (solvedCount() < NEED) { showLocked(); return; }
+    if (built) { showBest(); return; }
+    built = true;
+    form.innerHTML = ITEMS.map(function (q, i) {
     var opts = q.options.map(function (t, j) {
       return '<label class="opt"><input type="radio" name="q' + i + '" value="' + j + '"><span>' + esc(t) + "</span></label>";
     }).join("");
     return '<fieldset class="q" data-i="' + i + '"><legend><span class="tag">' + (i + 1) + " · " + esc(q.topic) + "</span>" + esc(q.stem) + "</legend>" + opts + '<p class="exp" hidden></p></fieldset>';
   }).join("") + '<div class="actions"><button type="submit" class="primary">送出並計分</button><button type="button" class="ghost" id="reset">清空重考</button></div>';
 
-  form.addEventListener("submit", function (e) {
+  form.onsubmit = function (e) {
     e.preventDefault();
     var score = 0, blank = 0;
     ITEMS.forEach(function (q, i) {
@@ -73,20 +99,35 @@
     var note = document.getElementById("score");
     note.hidden = false;
     note.textContent = "得分 " + score + " / " + ITEMS.length + (blank ? "（未作答 " + blank + " 題）" : "");
-    if (best() == null || score > best()) localStorage.setItem(KEY, String(score));
+    if (best() == null || score > best()) localStorage.setItem(storageKey(KEY), String(score));
+    try { window.dispatchEvent(new Event("progress:saved")); } catch (err) {}
     showBest();
     note.scrollIntoView({ behavior: "smooth", block: "nearest" });
-  });
+  };
 
-  document.getElementById("reset").addEventListener("click", function () {
-    form.reset();
-    form.querySelectorAll(".q").forEach(function (box) {
-      box.classList.remove("ok", "ng");
-      var exp = box.querySelector(".exp");
-      exp.hidden = true;
-      exp.textContent = "";
+    var reset = document.getElementById("reset");
+    if (reset) reset.addEventListener("click", function () {
+      form.reset();
+      form.querySelectorAll(".q").forEach(function (box) {
+        box.classList.remove("ok", "ng");
+        var exp = box.querySelector(".exp");
+        exp.hidden = true;
+        exp.textContent = "";
+      });
+      document.getElementById("score").hidden = true;
     });
-    document.getElementById("score").hidden = true;
+    showBest();
+  }
+  function refresh() {
+    if (solvedCount() < NEED) showLocked();
+    else buildForm();
+  }
+  window.addEventListener("studentauth:change", function (ev) {
+    var r = ev.detail && ev.detail.reason;
+    if (r === "signin" || r === "switch" || r === "signout" || r === "reset" || r === "cloud") {
+      built = false;
+      refresh();
+    }
   });
-  showBest();
+  refresh();
 })();

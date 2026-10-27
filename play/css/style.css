@@ -1,7 +1,7 @@
 :root{
   --bg:#10160f; --panel:#1a2618; --line:#31442c;
   --ink:#f3f7ef; --muted:#b7c7ae; --accent:#d6e27a; --accent2:#8fd18a;
-  --bad:#ff8f86; --ok:#9be7a8;
+  --bad:#ff8f86; --ok:#9be7a8; --warn:#ffcf6b;
   --sans:"Noto Sans TC",system-ui,sans-serif;
 }
 *{box-sizing:border-box}
@@ -62,4 +62,16 @@ fieldset.q.ng{border-color:var(--bad)}
 legend{font-weight:700;padding:0;margin-bottom:8px}
 .tag{display:inline-block;margin-right:8px;color:var(--accent);font-weight:700}
 .score{font-size:1.3rem;font-weight:800}
+.gsi{margin:16px 0;padding:14px 18px;border-radius:12px;border:1px solid var(--line);background:var(--panel);display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.gsi.gsi-in{border-color:var(--accent)}
+.gsi .gsi-txt{display:flex;flex-direction:column;gap:3px;flex:1;min-width:220px}
+.gsi .gsi-txt span,.gsi .gsi-mail,.gsi .gsi-status,.gsi .gsi-hint{color:var(--muted)}
+.gsi .gsi-txt span,.gsi .gsi-mail,.gsi .gsi-status{font-size:.85rem}
+.gsi .gsi-name{font-weight:800}
+.gsi .gsi-ok{color:var(--accent)}
+.gsi .gsi-status{flex:1;min-width:180px}
+.gsi .gsi-out{margin-left:auto;cursor:pointer;background:transparent;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:6px 12px;font:inherit}
+.gsi .gsi-warn{color:var(--warn);font-size:.85rem}
+.card.locked{opacity:.72;cursor:default}
+.card.locked:hover{border-color:var(--line)}
 @media(max-width:640px){.maphead{align-items:flex-start;flex-direction:column}h1{font-size:1.45rem}}

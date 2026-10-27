@@ -18,16 +18,23 @@
     </div>
   </div>
 </header>
+<div class="wrap"><div id="gsiArea" class="gsi"></div></div>
 <main class="wrap">
   <section class="hero">
-    <div class="eyebrow">送出後才看詳解</div>
+    <div class="eyebrow">十二關完成後才開放</div>
     <h1>線上測驗</h1>
-    <p class="hint">二十題四選一，涵蓋十二個概念。未送出前不顯示對錯。最高分只存在這台瀏覽器。</p>
+    <p class="hint">二十題四選一。送出後才顯示分數與詳解。請先登入，成績記在這個 Google 帳號。</p>
     <p id="best" class="hint"></p>
     <p id="score" class="score" hidden></p>
   </section>
   <form id="exam"></form>
 </main>
-<script src="js/exam.js?v=2"></script>
+<script>window.REVIEW_DATA = { module: "ct", title: "運算思維" };</script>
+<script src="https://accounts.google.com/gsi/client" async></script>
+<script src="../js/google-auth-config.js"></script>
+<script src="../js/firebase-config.js"></script>
+<script src="../js/student-auth.js"></script>
+<script src="../js/cloud-sync.js"></script>
+<script src="js/exam.js?v=3"></script>
 </body>
 </html>
